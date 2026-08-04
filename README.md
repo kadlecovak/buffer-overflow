@@ -4,7 +4,7 @@ This project demonstrates the complete process of exploiting a classic **stack-b
 
 Instead of only presenting the final exploit, the repository documents the entire thought process behind the attack: from understanding the stack layout to constructing custom shellcode capable of executing arbitrary code.
 
-The objective is not simply to crash the application but to **gain control over the Instruction Pointer (EIP)** and redirect program execution toward attacker-controlled machine code located inside the vulnerable input buffer.
+The objective is to **gain control over the Instruction Pointer (EIP)** and redirect program execution toward attacker-controlled machine code located inside the vulnerable input buffer.
 
 The exploit launches:
 
@@ -101,7 +101,7 @@ EIP = 32323131 ("1122")
 
 This immediately identifies which portion of the input reached each register.
 
-Why this string?
+### Why this string?
 Instead of guessing the distance blindly and crashing the program repeatedly, we send a unique string of characters, where every four-byte sequence appears only once. When the crash occurs, the debugger shows us exactly which four characters landed in the EIP register. This gives us the precise byte count (offset) needed to reach and control the execution flow.
 
 # 3. Payload Placement Strategy
