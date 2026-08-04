@@ -280,7 +280,7 @@ Hex Representation:
 83 C4 80 33 C0 50 68 2E 74 78 74 68 74 65 78 74 68 70 61 64 20 68 6E 6F 74 65 8B DC 83 C0 05 50 53 B8 *D0 F2 AE 76* FF D0
 ```
 
-Where *D0 F2 AE 76* is the address of `WinExec`.
+Where \*D0 F2 AE 76\* is the address of `WinExec`.
 
 # Requirements
 
