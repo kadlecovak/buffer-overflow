@@ -59,7 +59,7 @@ Each step is explained in detail below.
 
 # 1. Stack Layout Analysis
 
-Before attempting to overwrite the return address, it is necessary to understand how the vulnerable function organizes its local stack frame.
+Before attempting to overwrite the return address, it is necessary to understand how the vulnerable function organizes its local stack frame. To achieve this, dynamic analysis was performed using the OllyDbg debugger to inspect the memory state during execution.
 
 After entering the function, the stack looked as follows:
 
