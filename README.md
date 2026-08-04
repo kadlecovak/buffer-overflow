@@ -80,7 +80,7 @@ Immediately after the buffer, the function stores:
 - the previous Base Pointer (`EBP`),
 - followed by the Return Address.
 
-To hijack the program, we must overwrite the Return Address (EIP). By mapping the stack, we visualize the layout of the memory and understand the distance between our starting point (the buffer) and our target (EIP).
+To hijack the program, we must overwrite the Return Address (`EIP`). By mapping the stack, we visualize the layout of the memory and understand the distance between our starting point (the buffer) and our target (`EIP`).
 
 # 2. Finding the Offset
 
@@ -102,7 +102,7 @@ EIP = 32323131 ("1122")
 This immediately identifies which portion of the input reached each register.
 
 ### Why this string?
-Instead of guessing the distance blindly and crashing the program repeatedly, we send a unique string of characters, where every four-byte sequence appears only once. When the crash occurs, the debugger shows us exactly which four characters landed in the EIP register. This gives us the precise byte count (offset) needed to reach and control the execution flow.
+Instead of guessing the distance blindly and crashing the program repeatedly, we send a unique string of characters, where every four-byte sequence appears only once. When the crash occurs, the debugger shows us exactly which four characters landed in the `EIP` register. This gives us the precise byte count (offset) needed to reach and control the execution flow.
 
 # 3. Payload Placement Strategy
 
@@ -114,8 +114,8 @@ Two possible approaches were considered.
 
 ```text
 +------------------------------+
-| Shellcode       |
-| Padding if necessary                      |
+| Shellcode                    |
+| Padding if necessary         |
 | New Return Address ----------+----+
 +------------------------------+    |
                                     |
@@ -138,7 +138,7 @@ In this approach, the shellcode is written directly into the vulnerable buffer. 
 
 Another possibility is to overwrite the return address with a pointer to shellcode stored later in memory.
 
-We chose for the first option, writing the shellcode directly into the start of the buffer. Once we control EIP, we need to point it to our malicious code. By putting our shellcode right at the start of the buffer, we know its exact, predictable memory address (0019FEF8).
+We chose for the first option, writing the shellcode directly into the start of the buffer. Once we control `EIP`, we need to point it to our malicious code. By putting our shellcode right at the start of the buffer, we know its exact, predictable memory address (`0019FEF8`).
 
 # 4. Encoding the Return Address
 
@@ -157,7 +157,7 @@ F8 FE 19 00
 ``` 
 
 Since we are typing into a Windows console, we converted these hexadecimal values to decimal and used ALT + Numpad codes:
-
+```
 F8h -> 248 (ALT+248)
 
 FEh -> 254 (ALT+254)
@@ -165,13 +165,15 @@ FEh -> 254 (ALT+254)
 19h -> 25  (ALT+25)
 
 00h -> 0   (Gets appended automatically by the gets() function as a null-terminator).
-
+```
 # 5. Bad Character Analysis
 
-During shellcode development, certain hex characters had to be strictly avoided since we are delivering our payload via a string input function (gets()). Sending a byte like 0x0A (Newline) acts like pressing the "Enter" key. It instantly truncates our payload, rendering the exploit useless. These bytes are commonly referred to as **bad characters**.
+During shellcode development, certain hex characters had to be strictly avoided since we are delivering our payload via a string input function (`gets()`). Sending a byte like `0x0A` (Newline) acts like pressing the "Enter" key. It instantly truncates our payload, rendering the exploit useless. 
+
+These bytes are commonly referred to as **bad characters**.
 
 ## Observed Bad Characters
-
+```
 0x08 (Dec 8) - Backspace, deletes previous characters in the console.
 
 0x0A (Dec 10) - Newline \n, prematurely terminates gets().
@@ -179,12 +181,12 @@ During shellcode development, certain hex characters had to be strictly avoided 
 0x1A (Dec 26) - EOF (End of File), prematurely terminates gets().
 
 0x0D (Dec 13) - Carriage Return \r, caused unexpected terminal behavior.
-
+```
 # 6. Dynamic Resolution of WinExec
 
 The final payload needs a Windows API function capable of launching another program.
 
-Several alternatives exist, but **WinExec** was chosen because it provides a straightforward interface for executing external applications.
+Several alternatives exist, but `WinExec` was chosen because it provides a straightforward interface for executing external applications.
 
 The intended API call is:
 
@@ -223,7 +225,7 @@ This value is later embedded into the shellcode.
 
 # 7. Custom x86 Shellcode
 
-After controlling the Instruction Pointer (EIP), the processor begins executing whatever instructions are located at the address stored in the overwritten return pointer.
+After controlling the Instruction Pointer (`EIP`), the processor begins executing whatever instructions are located at the address stored in the overwritten return pointer.
 
 Now we need to:
 
@@ -278,6 +280,8 @@ Hex Representation:
 83 C4 80 33 C0 50 68 2E 74 78 74 68 74 65 78 74 68 70 61 64 20 68 6E 6F 74 65 8B DC 83 C0 05 50 53 B8 *D0 F2 AE 76* FF D0
 ```
 
+Where *D0 F2 AE 76* is the address of `WinExec`.
+
 # Requirements
 
 - Buffer overflow vulnerability
@@ -290,8 +294,8 @@ Hex Representation:
 # Running
 
 ```bash
-vulnerable < exploit.bin
+application < exploit.bin
 ```
 
-To test the exploit on another machine, remember to replace the embedded WinExec address with the value resolved by sysfunc.c.
+To test the exploit on another machine, remember to replace the embedded `WinExec` address with the value resolved by sysfunc.c.
 
