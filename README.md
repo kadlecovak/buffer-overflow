@@ -138,7 +138,7 @@ In this approach, the shellcode is written directly into the vulnerable buffer. 
 
 Another possibility is to overwrite the return address with a pointer to shellcode stored later in memory.
 
-We chose for the first option, writing the shellcode directly into the start of the buffer. Once we control `EIP`, we need to point it to our malicious code. By putting our shellcode right at the start of the buffer, we know its exact, predictable memory address (`0019FEF8`).
+We chose the first option, writing the shellcode directly into the start of the buffer. Once we control `EIP`, we need to point it to our malicious code. By putting our shellcode right at the start of the buffer, we know its exact, predictable memory address (`0019FEF8`).
 
 # 4. Encoding the Return Address
 
